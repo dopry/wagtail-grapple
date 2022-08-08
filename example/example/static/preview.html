@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script
+        type="text/javascript"
+        src="https://unpkg.com/graphql-ws/umd/graphql-ws.min.js"
+    ></script>
+
+    <script src="https://unpkg.com/subscriptions-transport-ws@0.8.3/browser/client.js" crossorigin="anonymous"></script>
+    <script>
+        function go() {
+            var querystring = window.location.search.replace(/^\?/, '');
+            var params = {};
+            querystring.replace(/([^=&]+)=([^&]*)/g, function(m, key, value) {
+                params[decodeURIComponent(key)] = decodeURIComponent(value);
+            });
+            contentType = params['content_type'];
+            token = params['token'];
+            const node = document.createElement('pre');
+            node.innerText = `subscription {
+    page(contentType: "${contentType}", token: "${token}") {
+        id
+        title
+        contentType
+        pageType
+    }
+}`
+            document.body.appendChild(node)
+
+
+            const client = new window.SubscriptionsTransportWs.SubscriptionClient('ws://localhost:8000/subscriptions', {
+                    reconnect: true
+            });
+            const query = `subscription {
+                page(contentType: "${contentType}", token: "${token}") {
+                    id
+                    title
+                    contentType
+                    pageType
+                }
+            }`
+            const variables = {}
+            const operationName = null
+            const request = {
+                query, 
+                variables,
+                operationName
+            }
+
+            const observable = client.request(request)
+                     
+            observable.subscribe(
+              
+                {
+                    next: (data) => {
+                        console.log(data);
+                        const node = document.createElement('pre');
+                        node.innerText = JSON.stringify(data, null, 2);
+                        document.body.appendChild(node)
+                    },
+                    error: (event, err) => {
+                        console.error(event, err);
+                    },
+                    complete: () => {
+                        console.log('complete');
+                    },
+                }
+            );
+
+        }
+    </script>
+</head>
+<body onload="go()">
+    <h1>Live Preview</h1>
+</body>
+</html>

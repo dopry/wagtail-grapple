@@ -139,3 +139,5 @@ Temporary Items
 *.sublime-workspace
 .vscode
 .idea
+
+/example/static/

@@ -379,6 +379,7 @@ if has_channels:
 
     @receiver(preview_update)
     def on_updated(sender, token, **kwargs):
+        print("preview_update", token)
         preview_subject.on_next(token)
 
     # Subscription Mixin
@@ -428,6 +429,7 @@ if has_channels:
             )
 
             def resolve_page(self, info, **kwargs):
+                print ("resolve_page", kwargs)
                 return preview_observable(
                     id=kwargs.get("id"),
                     slug=kwargs.get("slug"),

@@ -182,8 +182,13 @@ GRAPPLE = {
     "EXPOSE_GRAPHIQL": True,
 }
 
-HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}
-HEADLESS_PREVIEW_LIVE = True
+
+WAGTAIL_HEADLESS_PREVIEW = {
+    "CLIENT_URLS": {"default": "http://localhost:8000/static/preview.html"},  # defaults to an empty dict. You must at the very least define the default client URL.
+    "LIVE_PREVIEW": True,  # set to True to enable live preview functionality
+    "SERVE_BASE_URL": None,  # can be used for HeadlessServeMixin
+    "REDIRECT_ON_PREVIEW": False,  # set to True to redirect to the preview instead of using the Wagtail default mechanism
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 

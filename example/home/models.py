@@ -69,12 +69,12 @@ document_model_string = getattr(
 class SimpleModel(models.Model):
     pass
 
-
-class HomePage(Page):
+from wagtail_headless_preview.models import HeadlessPreviewMixin
+class HomePage(Page, HeadlessPreviewMixin):
     pass
 
 
-class AuthorPage(Page):
+class AuthorPage(Page, HeadlessPreviewMixin):
     name = models.CharField(max_length=255)
 
     content_panels = Page.content_panels + [FieldPanel("name")]
