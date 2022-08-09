@@ -283,7 +283,7 @@ class BlogTest(BaseGrappleTest):
                 )
                 self.assertEquals(
                     query_blocks[count]["image"]["src"],
-                    settings.BASE_URL + block.value.file.url,
+                    block.value.file.url,
                 )
                 # Increment the count
                 count += 1
@@ -304,17 +304,11 @@ class BlogTest(BaseGrappleTest):
                 }
             """,
         )
+        block = self.blog_page.body[7].value[0]
 
         # Get first image url
         url = query_blocks[0]["blocks"][0]["image"]["src"]
-
-        # Check that src is valid url
-        validator = URLValidator()
-        try:
-            # Run validator, If no exception thrown then we pass test
-            validator(url)
-        except ValidationError:
-            self.fail(f"{url} is not a valid url")
+        self.assertEquals(url, block.value.file.url)
 
     def test_blog_body_calloutblock(self):
         block_type = "CalloutBlock"
@@ -412,8 +406,7 @@ class BlogTest(BaseGrappleTest):
                     )
                     self.assertEquals(
                         image["image"]["src"],
-                        settings.BASE_URL
-                        + str(block.value["images"][key].value["image"].file.url),
+                        str(block.value["images"][key].value["image"].file.url),
                     )
                 # Increment the count
                 count += 1

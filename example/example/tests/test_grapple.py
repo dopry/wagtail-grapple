@@ -870,14 +870,35 @@ class ImagesTest(BaseGrappleTest):
             }
         }
         """
-
         executed = self.client.execute(query)
 
         self.assertEquals(executed["data"]["images"][0]["id"], "1")
         self.assertEquals(
             executed["data"]["images"][0]["url"],
-            "http://localhost:8000" + self.example_image.file.url,
+             self.example_image.file.url,
         )
+        self.assertEquals(
+            executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"]
+        )
+
+    @override_settings(MEDIA_URL='https://localhost:8000/')
+    def test_query_url_field_media_url(self):
+        query = """
+        {
+            images {
+                id
+                url
+                src
+            }
+        }
+        """
+        print(self.example_image.file.storage.base_url)
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(executed["data"]["images"][0]["id"], "1")
+        self.assertTrue(executed["data"]["images"][0]["url"].startswith('https://localhost:8000/'))
+        self.assertEquals(executed["data"]["images"][0]["url"], self.example_image.file.url)
         self.assertEquals(
             executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"]
         )
@@ -898,10 +919,31 @@ class ImagesTest(BaseGrappleTest):
 
         self.assertEquals(executed["data"]["images"][0]["id"], "1")
         self.assertEquals(
-            executed["data"]["images"][0]["rendition"]["url"],
-            "http://localhost:8000"
-            + self.example_image.get_rendition("width-200").file.url,
+            executed["data"]["images"][0]["rendition"]["url"],   self.example_image.get_rendition("width-200").file.url,
         )
+
+    @override_settings(MEDIA_URL='https://localhost:8000/')
+    def test_query_rendition_url_field_media_url(self):
+        query = """
+        {
+            images {
+                id
+                rendition(width: 200) {
+                    url
+                }
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(executed["data"]["images"][0]["id"], "1")
+        self.assertTrue(executed["data"]["images"][0]["rendition"]["url"].startswith('https://localhost:8000/'))
+        self.assertEquals(
+            executed["data"]["images"][0]["rendition"]["url"],   self.example_image.get_rendition("width-200").file.url,
+        )
+
+
 
     def test_renditions(self):
         query = """

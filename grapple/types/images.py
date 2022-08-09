@@ -7,7 +7,7 @@ from wagtail.images.models import SourceImageIOError
 
 from ..registry import registry
 from ..settings import grapple_settings
-from ..utils import get_media_item_url, resolve_queryset
+from ..utils import resolve_queryset
 from .collections import CollectionObjectType
 from .structures import QuerySetList
 from .tags import TagObjectType
@@ -33,18 +33,6 @@ class BaseImageObjectType(graphene.ObjectType):
     collection = graphene.Field(lambda: CollectionObjectType, required=True)
     tags = graphene.List(graphene.NonNull(lambda: TagObjectType), required=True)
 
-    def resolve_url(self, info, **kwargs):
-        """
-        Get the uploaded image url.
-        """
-        return get_media_item_url(self)
-
-    def resolve_src(self, info, **kwargs):
-        """
-        Deprecated. Use the `url` attribute.
-        """
-        return get_media_item_url(self)
-
     def resolve_aspect_ratio(self, info, **kwargs):
         """
         Calculate aspect ratio for the image.
@@ -61,6 +49,12 @@ class BaseImageObjectType(graphene.ObjectType):
 class ImageRenditionObjectType(DjangoObjectType, BaseImageObjectType):
     class Meta:
         model = WagtailImageRendition
+
+    def resolve_url(self, info, **kwargs):
+        return self.url
+
+    def resolve_src(self, info, **kwargs):
+        return self.url
 
     def resolve_image(self, info, **kwargs):
         return self.image
@@ -101,6 +95,12 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
     class Meta:
         model = WagtailImage
 
+    def resolve_url(self, info, **kwargs):
+        return self.file.url
+
+    def resolve_src(self, info, **kwargs):
+        return self.file.url
+
     def resolve_rendition(self, info, **kwargs):
         """
         Render a custom rendition of the current image.
@@ -110,18 +110,18 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
         # Only allowed the defined filters (thus renditions)
         if rendition_allowed(filters):
             try:
-                img = self.get_rendition(filters)
+                rendition = self.get_rendition(filters)
             except SourceImageIOError:
                 return
 
             rendition_type = get_rendition_type()
 
             return rendition_type(
-                id=img.id,
-                url=get_media_item_url(img),
-                width=img.width,
-                height=img.height,
-                file=img.file,
+                id=rendition.id,
+                url=rendition.url,
+                width=rendition.width,
+                height=rendition.height,
+                file=rendition.file,
                 image=self,
             )
 
@@ -142,9 +142,9 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
 
             return ", ".join(
                 [
-                    f"{get_media_item_url(img)} {img.width}w"
-                    for img in rendition_list
-                    if img is not None
+                    f"{rendition.url} {rendition.width}w"
+                    for rendition in rendition_list
+                    if rendition is not None
                 ]
             )
 
