@@ -3,7 +3,7 @@ from graphene_django import DjangoObjectType
 from wagtailmedia.models import Media, get_media_model
 
 from ..registry import registry
-from ..utils import get_media_item_url, resolve_queryset
+from ..utils import resolve_queryset
 from .collections import CollectionObjectType
 from .structures import QuerySetList
 
@@ -18,9 +18,9 @@ class MediaObjectType(DjangoObjectType):
 
     def resolve_url(self, info, **kwargs):
         """
-        Get Media file url.
+        Get Media file url
         """
-        return get_media_item_url(self)
+        return self.url
 
 
 def MediaQuery():
