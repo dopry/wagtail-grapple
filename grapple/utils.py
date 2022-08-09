@@ -213,18 +213,6 @@ def resolve_paginated_queryset(
     return get_paginated_result(qs, page, per_page)
 
 
-def get_media_item_url(cls):
-    url = ""
-    if hasattr(cls, "url"):
-        url = cls.url
-    elif hasattr(cls, "file"):
-        url = cls.file.url
-
-    if url[0] == "/":
-        return settings.BASE_URL + url
-    return url
-
-
 def image_as_base64(image_file, format="png"):
     """
     :param `image_file` for the complete path of image.
