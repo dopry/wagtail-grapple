@@ -14,7 +14,9 @@ class RedirectType(graphene.ObjectType):
 
     # Give old_path with BASE_URL attached.
     def resolve_old_url(self, info, **kwargs):
-        return settings.BASE_URL + self.old_path
+        if self.site is None:
+            return settings.BASE_URL + self.old_path
+        return self.site.root_url + self.old_path
 
     # Get new url
     def resolve_new_url(self, info, **kwargs):
